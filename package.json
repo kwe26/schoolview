@@ -1,0 +1,58 @@
+{
+  "name": "schoolview",
+  "version": "1.0.0",
+  "description": "A desktop widget for school class management.",
+  "main": "index.js",
+  "private": true,
+  "author": "Kiwi",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "electron": "14.0.0",
+    "electron-builder": "^22.11.7"
+  },
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win --x64 --ia32",
+    "build:linux": "electron-builder --linux"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {},
+  "build": {
+    "appId": "com.kiwi.schoolview",
+    "productName": "SchoolView",
+    "copyright": "Copyright © 2024 Kiwi",
+    "files": [
+      "index.js",
+      "preload.js",
+      "index.html",
+      "config.html",
+      "icon.ico",
+      "icon.png"
+    ],
+    "win": {
+      "icon": "./icon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "icon": "./icon.png",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Education"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "./icon.ico",
+      "uninstallerIcon": "./icon.ico",
+      "installerHeaderIcon": "./icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

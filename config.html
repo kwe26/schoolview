@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration</title>
+    <style>
+        /* --- MODIFIED: Body and basic styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0; /* Removed padding, will be on container */
+            background-color: #f4f4f4; /* Default background */
+            color: #333; /* Default text color */
+            border: 1px solid #aaa; /* Border for frameless window */
+            border-radius: 8px;
+            overflow: hidden; /* To contain border-radius */
+            height: 100vh;
+            /* --- ADDED: Transition for theme change --- */
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* --- ADDED: Custom Title Bar --- */
+        #title-bar {
+            width: 100%;
+            height: 32px;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            -webkit-app-region: drag; /* Makes title bar draggable */
+            border-bottom: 1px solid #ccc;
+        }
+        #title-bar-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .title-bar-controls {
+            display: flex;
+            -webkit-app-region: no-drag; /* Makes buttons clickable */
+        }
+        .title-bar-btn {
+            width: 20px;
+            height: 20px;
+            border: none;
+            border-radius: 50%;
+            margin-left: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #minimize-btn {
+            background-color: #f1c40f;
+        }
+        #minimize-btn:hover {
+            background-color: #f39c12;
+        }
+        #close-config-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        #close-config-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* --- MODIFIED: Form Container --- */
+        .form-container {
+            padding: 15px 20px; /* Reduced padding */
+            /* --- MODIFIED: Height for scrolling on small screens --- */
+            height: calc(100vh - 32px - 70px); /* 32px title, 70px buttons */
+            overflow-y: auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.3rem; /* Reduced font size */
+            margin-top: 0;
+            margin-bottom: 15px; /* Reduced margin */
+        }
+        .form-group {
+            margin-bottom: 10px; /* Reduced margin */
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem; /* Reduced font size */
+            font-weight: bold;
+            margin-bottom: 4px; /* Reduced margin */
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 6px; /* Reduced padding */
+            border-radius: 4px; /* Reduced border-radius */
+            border: 1px solid #bdc3c7;
+            font-size: 0.9rem; /* Reduced font size */
+            box-sizing: border-box; /* Important */
+            /* --- ADDED: Transition for theme change --- */
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+        
+        /* --- ADDED: Radio button group styles --- */
+        .radio-group label {
+            font-weight: normal;
+            font-size: 0.9rem;
+            margin-right: 10px;
+        }
+        .radio-group input {
+            width: auto;
+            margin-right: 3px;
+            position: relative;
+            top: 2px;
+        }
+
+        /* --- ADDED: Period Button Grid Styles --- */
+        .period-grid-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .period-radio-btn input[type="radio"] {
+            display: none; /* Hide the actual radio button */
+        }
+        .period-radio-btn label {
+            display: block;
+            width: 100%;
+            padding: 8px 5px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            /* Inherit from theme-aware styles */
+            background-color: inherit;
+            color: inherit;
+        }
+        /* Style for selected period */
+        .period-radio-btn input[type="radio"]:checked + label {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        /* Light theme selected */
+        body.theme-light .period-radio-btn input[type="radio"]:checked + label {
+            background-color: #ffffff;
+            color: #3498db;
+            border-color: #ffffff;
+        }
+        /* Dark theme selected */
+        body.theme-dark .period-radio-btn input[type="radio"]:checked + label {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+
+
+        /* --- ADDED: Theme-aware styles --- */
+        body.theme-dark { color: #2c3e50; }
+        body.theme-light { color: #ffffff; }
+        
+        body.theme-dark h1,
+        body.theme-dark .form-group label,
+        body.theme-dark .radio-group label,
+        body.theme-dark .theme-editor-item label,
+        body.theme-dark .period-radio-btn label {
+            color: #2c3e50;
+        }
+        body.theme-light h1,
+        body.theme-light .form-group label,
+        body.theme-light .radio-group label,
+        body.theme-light .theme-editor-item label,
+        body.theme-light .period-radio-btn label {
+            color: #ffffff;
+        }
+
+        body.theme-dark .form-group input,
+        body.theme-dark .form-group select,
+        body.theme-dark .theme-editor-item input[type="color"] {
+            background-color: #ffffff;
+            border-color: #bdc3c7;
+            color: #333;
+        }
+        body.theme-light .form-group input,
+        body.theme-light .form-group select,
+        body.theme-light .theme-editor-item input[type="color"],
+        body.theme-light .period-radio-btn label {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.5);
+            color: #ffffff;
+        }
+        
+        body.theme-dark .form-group select option {
+            background-color: #ffffff;
+            color: #333;
+        }
+        /* Note: Light theme select options are OS-dependent and hard to style */
+
+        body.theme-light .radio-group input {
+            filter: invert(1) brightness(1);
+        }
+        /* --- End Theme-aware styles --- */
+        
+        /* --- ADDED: Theme Editor Styles --- */
+        .theme-editor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .theme-editor-item label {
+            font-weight: normal;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+        .theme-editor-item input[type="color"] {
+            width: 60px; /* Smaller width for color picker */
+            height: 30px;
+            padding: 2px; /* Small padding */
+            border-radius: 4px;
+            /* Uses theme-aware styles for border/bg */
+        }
+
+        /* --- MODIFIED: Button Bar --- */
+        .button-bar {
+            /* margin-top: 20px; */ /* REMOVED */
+            display: flex;
+            justify-content: space-between;
+            /* --- ADDED --- */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px; /* Set fixed height */
+            padding: 15px 20px; /* Match form-container padding */
+            background-color: #f4f4f4; /* Default bg */
+            border-top: 1px solid #ccc;
+            box-sizing: border-box;
+            align-items: center; /* Vertically center buttons */
+        }
+        .btn {
+            padding: 8px 12px; /* Reduced padding */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem; /* Reduced font size */
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+            width: 48%;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        #save-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        #save-btn:hover {
+            background-color: #27ae60;
+        }
+        #cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        #cancel-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- --- ADDED: Custom Title Bar --- -->
+    <div id="title-bar">
+        <div id="title-bar-title">Configuration</div>
+        <div class="title-bar-controls">
+            <button class="title-bar-btn" id="minimize-btn" title="Minimize">-</button>
+            <button class="title-bar-btn" id="close-config-btn" title="Close">x</button>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h1>Edit Details</h1>
+
+        <!-- ... Form groups ... -->
+        <div class="form-group">
+            <label for="edit-class">Class</label>
+            <select id="edit-class"></select>
+        </div>
+        <div class="form-group">
+            <label for="edit-section">Section</label>
+            <select id="edit-section"></select>
+        </div>
+        <div class="form-group">
+            <label for="edit-strength">T. Strength</label>
+            <input type="number" id="edit-strength" value="0">
+        </div>
+        <div class="form-group">
+            <label for="edit-present">Present</label>
+            <input type="number" id="edit-present" value="0">
+        </div>
+        
+        <!-- --- MODIFIED: Period Input --- -->
+        <div class="form-group">
+            <label>Period</label>
+            <div class="period-grid-group" id="edit-period-grid">
+                <!-- Radio buttons will be generated by JS -->
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="edit-subject">Subject</label>
+            <select id="edit-subject"></select>
+        </div>
+        
+        <!-- --- MODIFIED: Teacher Input Logic --- -->
+        <div class="form-group">
+            <label>Teacher Input Method</label>
+            <div class="radio-group">
+                <input type="radio" id="teacher-select-radio" name="teacher-method" value="select">
+                <label for="teacher-select-radio">Select from list</label>
+                <input type="radio" id="teacher-manual-radio" name="teacher-method" value="manual" checked>
+                <label for="teacher-manual-radio">Enter manually</label>
+            </div>
+        </div>
+
+        <div class="form-group" id="teacher-select-group" style="display: none;">
+            <label for="edit-teacher-select">Subject Teacher (Select)</label>
+            <select id="edit-teacher-select"></select>
+        </div>
+        
+        <div class="form-group" id="teacher-manual-group">
+            <label for="edit-teacher-manual">Subject Teacher (Manual)</label>
+            <input type="text" id="edit-teacher-manual" placeholder="Teacher Name">
+        </div>
+        <!-- --- End Teacher Input Logic --- -->
+
+        <!-- --- ADDED: Theme Customization --- -->
+        <div class="form-group">
+            <label>Theme Customization</label>
+            <div id="theme-editor-container">
+                <!-- Color pickers will be injected here by JS -->
+            </div>
+        </div>
+        <!-- --- End Theme Customization --- -->
+
+
+        <!-- Button Bar -->
+    </div>
+    
+    <!-- --- MODIFIED: Button Bar moved out of form-container --- -->
+    <div class="button-bar">
+        <button class="btn" id="save-btn">Save</button>
+        <button class="btn" id="cancel-btn">Cancel</button>
+    </div>
+
+    <script>
+        // --- MODIFIED: Default Subject Colors ---
+        const defaultSubjectColors = {
+            'Maths': '#2980b9',     // Deep Blue (Light Text)
+            'Science': '#27ae60',    // Green (Light Text)
+            'English': '#c0392b',    // Pomegranate (Light Text)
+            'History': '#8e44ad',    // Purple (Light Text)
+            'Geo': '#16a085',      // Teal (Light Text)
+            'Civics': '#d35400',     // Carrot (Light Text)
+            'Economics': '#e67e22',   // Pumpkin (Light Text)
+            'AI': '#2c3e50',       // Dark Blue/Grey (Light Text)
+            'P.ED': '#5D6D7E',       // Dark Grey (Light Text)
+            'Library': '#34495e',     // Wet Asphalt (Light Text)
+            'Odia': '#3498db',      // Bright Blue (Light Text)
+            'Hindi': '#9b59b6',     // Amethyst (Light Text)
+            'Break': '#4e54c8',     // Indigo (Light Text)
+            'Default': '#5D6D7E'    // Dark Grey (Light Text)
+        };
+        // This will be populated from localStorage
+        let subjectColors = {};
+
+        // --- Data Definitions ---
+        const classes = ['VIII', 'IX', 'X'];
+        const sections = ['A', 'B', 'C', 'D', 'E', 'F'];
+        // This will be populated by loadAndApplyColors
+        const subjects = []; 
+        
+        // --- MODIFIED: Teacher list is now populated ---
+        const teacherList = [
+            "Bijaylaxmi Mam",
+            "Suren Sir",
+            "Biswajit Sir",
+            "Suvendu Sir",
+            "Minati Mam",
+            "Sarmistha Mam",
+            "Ananya Mam",
+            "Paresh Sir",
+        ];
+
+        // --- DOM Elements ---
+        const saveBtn = document.getElementById('save-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const minimizeBtn = document.getElementById('minimize-btn');
+        const closeConfigBtn = document.getElementById('close-config-btn');
+        const themeEditorContainer = document.getElementById('theme-editor-container');
+
+        // Edit Inputs
+        const editClass = document.getElementById('edit-class');
+        const editSection = document.getElementById('edit-section');
+        const editStrength = document.getElementById('edit-strength');
+        const editPresent = document.getElementById('edit-present');
+        /* --- REMOVED: editPeriod text input --- */
+        const editSubject = document.getElementById('edit-subject');
+        
+        // --- MODIFIED: Teacher input elements ---
+        const teacherSelectRadio = document.getElementById('teacher-select-radio');
+        const teacherManualRadio = document.getElementById('teacher-manual-radio');
+        const teacherSelectGroup = document.getElementById('teacher-select-group');
+        const teacherManualGroup = document.getElementById('teacher-manual-group');
+        const editTeacherSelect = document.getElementById('edit-teacher-select');
+        const editTeacherManual = document.getElementById('edit-teacher-manual');
+
+        
+        /**
+         * Populates a <select> element with options from an array
+         */
+        function populateSelect(selectElement, optionsArray) {
+            selectElement.innerHTML = '';
+            optionsArray.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                selectElement.appendChild(opt);
+            });
+        }
+
+        // --- ADDED: Function to create period buttons ---
+        function createPeriodButtons() {
+            const container = document.getElementById('edit-period-grid');
+            let html = '';
+            for (let i = 1; i <= 8; i++) {
+                const periodValue = `${i}${i === 1 ? 'st' : i === 2 ? 'nd' : i === 3 ? 'rd' : 'th'} Period`;
+                html += `
+                    <div class="period-radio-btn">
+                        <input type="radio" id="period-${i}" name="period-radio" value="${periodValue}">
+                        <label for="period-${i}">${i}${i === 1 ? 'st' : i === 2 ? 'nd' : i === 3 ? 'rd' : 'th'}</label>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        // --- ADDED: getTextColor (copied from index.html) ---
+        function getTextColor(hexcolor){
+            hexcolor = hexcolor.replace("#", "");
+            const r = parseInt(hexcolor.substr(0,2),16);
+            const g = parseInt(hexcolor.substr(2,2),16);
+            const b = parseInt(hexcolor.substr(4,2),16);
+            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+            return (yiq >= 128) ? '#2c3e50' : '#ffffff';
+        }
+
+        // --- ADDED: Helper to lighten a hex color ---
+        function lightenColor(hex, percent) {
+            hex = hex.replace("#", "");
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+
+            const newR = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
+            const newG = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
+            const newB = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
+
+            const newHexR = newR.toString(16).padStart(2, '0');
+            const newHexG = newG.toString(16).padStart(2, '0');
+            const newHexB = newB.toString(16).padStart(2, '0');
+            return `#${newHexR}${newHexG}${newHexB}`;
+        }
+
+
+        // --- MODIFIED: Function to update config window theme ---
+        function updateConfigTheme(subject) {
+            // Find the button bar and set its background
+            const buttonBar = document.querySelector('.button-bar');
+            
+            if (subject === 'Break') {
+                const breakColor1 = subjectColors['Break'] || defaultSubjectColors['Break'];
+                const breakColor2 = lightenColor(breakColor1, 40);
+                document.body.style.background = `linear-gradient(45deg, ${breakColor1}, ${breakColor2})`;
+                document.body.classList.remove('theme-dark');
+                document.body.classList.add('theme-light'); // Use light text on gradient
+                buttonBar.style.backgroundColor = '#f4f4f4'; // Keep button bar default
+                return; // Skip solid color logic
+            }
+            
+            const color = subjectColors[subject] || subjectColors['Default'];
+            const isDarkText = getTextColor(color) === '#2c3e50';
+            
+            document.body.style.background = color; // Use background, not just bg-color
+            document.body.classList.toggle('theme-dark', isDarkText);
+            document.body.classList.toggle('theme-light', !isDarkText);
+            
+            // Make button bar contrast with theme
+            if (isDarkText) {
+                buttonBar.style.backgroundColor = '#f4f4f4'; // Light bar for dark text
+            } else {
+                buttonBar.style.backgroundColor = 'rgba(0,0,0,0.2)'; // Darker bar for light text
+            }
+        }
+
+        // --- ADDED: Function to load colors and create pickers ---
+        function loadAndApplyColors() {
+            subjectColors = {}; // Reset
+            const themeEditorHTML = [];
+            
+            // Get all subject keys from default
+            const allSubjects = Object.keys(defaultSubjectColors);
+            
+            // Re-populate subjects array for the dropdown
+            subjects.length = 0; // Clear existing
+            subjects.push(...allSubjects.filter(s => !['Break', 'Default'].includes(s)));
+            subjects.push('Break'); // Add Break at the end of dropdown
+
+            allSubjects.forEach(subject => {
+                if (subject === 'Default') return; // Don't make a picker for Default
+
+                // Load from storage or use default
+                const savedColor = localStorage.getItem('schoolView-color-' + subject) || defaultSubjectColors[subject];
+                subjectColors[subject] = savedColor;
+                
+                // Create HTML for color picker
+                themeEditorHTML.push(`
+                    <div class="theme-editor-item">
+                        <label for="color-${subject}">${subject}</label>
+                        <input type="color" id="color-${subject}" value="${savedColor}">
+                    </div>
+                `);
+            });
+            
+            // Add 'Default' to the live colors object
+            subjectColors['Default'] = localStorage.getItem('schoolView-color-Default') || defaultSubjectColors['Default'];
+
+            themeEditorContainer.innerHTML = themeEditorHTML.join('');
+            
+            // Add event listeners to new color pickers
+            allSubjects.forEach(subject => {
+                if (subject === 'Default') return;
+
+                const colorInput = document.getElementById(`color-${subject}`);
+                colorInput.addEventListener('input', (e) => {
+                    // Update the live subjectColors object
+                    subjectColors[subject] = e.target.value;
+                    // If this is the currently selected subject, update theme
+                    if (editSubject.value === subject) {
+                        updateConfigTheme(subject);
+                    }
+                });
+            });
+        }
+        
+        /**
+         * Loads current data from localStorage into the form
+         */
+        function loadData() {
+            // 0. Load colors and create theme editor FIRST
+            loadAndApplyColors();
+            // 0.5. Create period buttons
+            createPeriodButtons();
+
+            // 1. Populate select dropdowns
+            populateSelect(editClass, classes);
+            populateSelect(editSection, sections);
+            populateSelect(editSubject, subjects); // Now populated by loadAndApplyColors
+            populateSelect(editTeacherSelect, teacherList);
+            
+            // 2. Load data from localStorage
+            editClass.value = localStorage.getItem('schoolView-class') || 'IX';
+            editSection.value = localStorage.getItem('schoolView-section') || 'D';
+            editStrength.value = localStorage.getItem('schoolView-strength') || '39';
+            editPresent.value = localStorage.getItem('schoolView-present') || '0';
+            
+            // --- MODIFIED: Load Period ---
+            const savedPeriod = localStorage.getItem('schoolView-period') || '1st Period';
+            const periodRadio = document.querySelector(`input[name="period-radio"][value="${savedPeriod}"]`);
+            if (periodRadio) {
+                periodRadio.checked = true;
+            } else {
+                // Default to 1st if saved value is somehow invalid
+                document.getElementById('period-1').checked = true;
+            }
+            
+            const savedSubject = localStorage.getItem('schoolView-subject') || 'Maths';
+            editSubject.value = savedSubject;
+            
+            const savedTeacher = localStorage.getItem('schoolView-teacher') || 'Rem';
+
+            // 3. Set teacher input method
+            if (teacherList.length > 0 && teacherList.includes(savedTeacher)) {
+                // If teacher is in the list, use select
+                editTeacherSelect.value = savedTeacher;
+                teacherSelectRadio.checked = true;
+                teacherManualRadio.checked = false;
+                teacherSelectGroup.style.display = 'block';
+                teacherManualGroup.style.display = 'none';
+            } else {
+                // Otherwise, use manual input
+                editTeacherManual.value = savedTeacher;
+                teacherSelectRadio.checked = false;
+                teacherManualRadio.checked = true;
+                teacherSelectGroup.style.display = 'none';
+                teacherManualGroup.style.display = 'block';
+            }
+            
+            // 4. Disable select radio if list is empty
+            if (teacherList.length > 0) {
+                 teacherSelectRadio.disabled = false;
+            } else {
+                teacherSelectRadio.disabled = true;
+                teacherManualRadio.checked = true;
+                teacherSelectGroup.style.display = 'none';
+                teacherManualGroup.style.display = 'block';
+            }
+            
+            // 5. Set initial theme
+            updateConfigTheme(savedSubject);
+        }
+        
+        /**
+         * Sends data from form to main process
+         */
+        function handleSave() {
+            // Determine which teacher value to save
+            const teacherValue = teacherManualRadio.checked 
+                ? editTeacherManual.value 
+                : editTeacherSelect.value;
+            
+            // --- MODIFIED: Get selected period ---
+            const selectedPeriod = document.querySelector('input[name="period-radio"]:checked')?.value || '1M Period';
+
+            const data = {
+                class: editClass.value,
+                section: editSection.value,
+                strength: editStrength.value,
+                present: editPresent.value,
+                period: selectedPeriod, // Use the selected period
+                subject: editSubject.value,
+                teacher: teacherValue, // Use the determined value
+            };
+
+            // --- ADDED: Save custom colors ---
+            Object.keys(subjectColors).forEach(subject => {
+                if (subject !== 'Default') {
+                    const colorInput = document.getElementById(`color-${subject}`);
+                    if (colorInput) {
+                        localStorage.setItem(`schoolView-color-${subject}`, colorInput.value);
+                    }
+                }
+            });
+            
+            // Use the API exposed by preload.js
+            window.api.saveData(data);
+        }
+        
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', loadData);
+        saveBtn.addEventListener('click', handleSave);
+        cancelBtn.addEventListener('click', () => window.api.closeConfig());
+        
+        // --- ADDED: Title bar control listeners ---
+        minimizeBtn.addEventListener('click', () => window.api.minimizeConfig());
+        closeConfigBtn.addEventListener('click', () => window.api.closeConfig());
+        
+        // --- ADDED: Theme change listener ---
+        editSubject.addEventListener('change', (e) => {
+            updateConfigTheme(e.target.value);
+        });
+        
+        // --- ADDED: Teacher input toggle listeners ---
+        teacherSelectRadio.addEventListener('change', () => {
+            if (teacherSelectRadio.checked) {
+                teacherSelectGroup.style.display = 'block';
+                teacherManualGroup.style.display = 'none';
+            }
+        });
+        teacherManualRadio.addEventListener('change', () => {
+            if (teacherManualRadio.checked) {
+                teacherSelectGroup.style.display = 'none';
+                teacherManualGroup.style.display = 'block';
+            }
+        });
+        
+    </script>
+</body>
+</html>
+

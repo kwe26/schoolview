@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SchoolView</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* Default background color */
+            background-color: transparent; /* Neutral dark background */
+            font-family: Georgia, 'Times New Roman', Times, serif;
+            padding: 10px;
+            user-select: none;
+            /* -webkit-app-region: drag; REMOVED to make window non-moveable */
+            transition: none; /* No transition on body */
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .widget-container {
+            width: 100%;
+            height: 100%;
+            /* This is what will change color now */
+            background-color: #7f8c8d;
+            color: #ffffff;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 15px; /* Reduced padding */
+            padding-top: 15px;
+            overflow: hidden; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Make all buttons non-draggable */
+        button, input, select {
+            -webkit-app-region: no-drag;
+        }
+
+        /* Custom Close Button */
+        #close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            z-index: 100;
+        }
+
+        #close-btn:hover {
+            background: rgba(200, 0, 0, 0.8);
+        }
+        
+        /* --- UPDATED: Digital Clock Styles --- */
+        .clock-container {
+            width: 100%;
+            height: auto; /* Changed from 100px */
+            position: relative;
+            margin: 0 auto 5px auto; /* Reduced bottom margin */
+            border: none; /* Removed border */
+            border-radius: 0; /* Removed border-radius */
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 0; /* Reduced padding */
+            border-radius: 8px;
+        }
+
+        #digital-clock {
+            font-family: 'Arial', sans-serif;
+            font-size: 2.2rem; /* Reduced font size */
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        
+        #digital-ampm {
+            font-family: 'Arial', sans-serif;
+            font-size: 0.9rem; /* Reduced font size */
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* --- REMOVED: Analog clock styles (.clock-face, .clock-center, .hand, etc) --- */
+
+        /* View Mode Styling */
+        .view-mode {
+            margin-top: 5px; /* Reduced margin */
+        }
+        .view-mode p {
+            font-size: 0.95rem; /* <-- REDUCED font size */
+            margin-bottom: 4px; /* <-- REDUCED margin */
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .view-mode p span {
+            font-weight: normal;
+            margin-left: 8px;
+        }
+
+        /* Button Bar */
+        .button-bar {
+            margin-top: auto; /* Pushes button to the bottom */
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        #edit-config-btn {
+            background-color: #3498db;
+            color: white;
+            width: 100%;
+            padding: 6px 12px; /* <-- REDUCED padding */
+            font-size: 0.85rem; /* <-- REDUCED font size */
+        }
+
+        #edit-config-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* --- ADDED: Credit Text Style --- */
+        .credit-text {
+            font-family: Arial, sans-serif;
+            font-size: 0.6rem; /* Very small */
+            text-align: center;
+            color: currentColor; /* Inherit color from container */
+            opacity: 0.7;
+            margin-top: 5px; /* Small space from button */
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="widget-container">
+        <!-- Custom Close Button -->
+        <button id="close-btn" title="Close">x</button>
+
+        <!-- --- UPDATED: Live Digital Clock --- -->
+        <div class="clock-container">
+            <div id="digital-clock">00:00:00</div>
+            <div id="digital-ampm">AM</div>
+        </div>
+
+        <!-- View Mode: Displays the data -->
+        <div class="view-mode" id="view-mode">
+            <!-- --- MODIFIED: Combined Class and Section --- -->
+            <p>Class: <span id="view-class"></span> <span id="view-section"></span></p>
+            <p>T. Strength: <span id="view-strength"></span></p>
+            <p>Present: <span id="view-present"></span></p>
+            <p>Absent: <span id="view-absent"></span></p>
+            <p>Date: <span id="view-date"></span></p>
+            <p>Period: <span id="view-period"></span></p>
+            <p>Subject: <span id="view-subject"></span></p>
+            <p>S.T.: <span id="view-teacher"></span></p>
+        </div>
+
+        <!-- Button Bar -->
+        <div class="button-bar">
+            <!-- Combined Edit/Config Button -->
+            <button class="btn" id="edit-config-btn">Edit / Config</button>
+        </div>
+
+        <!-- --- ADDED: Credit Text --- -->
+        <p class="credit-text">Made by KWE26 (Pritam) / Kiwi</p>
+    </div>
+
+    <script>
+        // --- Subject Colors ---
+        const subjectColors = {
+            'Maths': '#2980b9',
+            'Science': '#27ae60',
+            'English': '#f39c12',
+            'History': '#8e44ad',
+            'Geo': '#16a085',
+            'Civics': '#d35400',
+            'Economics': '#c0392b',
+            'AI': '#2c3e50',
+            'P.ED': '#7f8c8d',
+            'Library': '#95a5a6',
+            'Odia': '#f1c40f',
+            'Hindi': '#e67e22',
+            'Default': '#7f8c8d'
+        };
+
+        // --- DOM Elements ---
+        const widgetContainer = document.querySelector('.widget-container'); // <-- ADDED
+        const closeBtn = document.getElementById('close-btn');
+        const editConfigBtn = document.getElementById('edit-config-btn');
+
+        // View Spans
+        const viewClass = document.getElementById('view-class');
+        const viewSection = document.getElementById('view-section');
+        const viewStrength = document.getElementById('view-strength');
+        const viewPresent = document.getElementById('view-present');
+        const viewAbsent = document.getElementById('view-absent');
+        const viewDate = document.getElementById('view-date');
+        const viewPeriod = document.getElementById('view-period');
+        const viewSubject = document.getElementById('view-subject');
+        const viewTeacher = document.getElementById('view-teacher');
+        
+        // Clock Hands
+        const digitalClock = document.getElementById('digital-clock'); // <-- ADDED
+        const digitalAmPm = document.getElementById('digital-ampm'); // <-- ADDED
+        // --- REMOVED: hourHand, minuteHand, secondHand ---
+
+        // --- Functions ---
+        
+        /**
+         * Determines if text color should be light or dark based on bg color
+         */
+        function getTextColor(hexcolor){
+            hexcolor = hexcolor.replace("#", "");
+            const r = parseInt(hexcolor.substr(0,2),16);
+            const g = parseInt(hexcolor.substr(2,2),16);
+            const b = parseInt(hexcolor.substr(4,2),16);
+            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+            return (yiq >= 128) ? '#2c3e50' : '#ffffff';
+        }
+        
+        /**
+         * Updates the background and text color based on the subject
+         */
+        function updateTheme(subject) {
+            const color = subjectColors[subject] || subjectColors['Default'];
+            const textColor = getTextColor(color);
+            
+            // --- MODIFIED: Target widget container instead of body ---
+            widgetContainer.style.backgroundColor = color;
+            widgetContainer.style.color = textColor;
+        }
+
+        /**
+         * Loads data from localStorage or sets defaults
+         */
+        function loadData() {
+            // Get saved data or use new defaults
+            const data = {
+                class: localStorage.getItem('schoolView-class') || 'IX',
+                section: localStorage.getItem('schoolView-section') || 'D',
+                strength: localStorage.getItem('schoolView-strength') || '39',
+                present: localStorage.getItem('schoolView-present') || '0', // Default 0
+                period: localStorage.getItem('schoolView-period') || '1st Period',
+                subject: localStorage.getItem('schoolView-subject') || 'Maths', // Default Maths
+                teacher: localStorage.getItem('schoolView-teacher') || 'Rem', // Default Rem
+            };
+
+            // 3. Set current date
+            const today = new Date();
+            const dateString = today.toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+            viewDate.textContent = dateString;
+
+            // 4. Update view fields
+            updateViewFields(data);
+            
+            // 5. Save the (potentially default) data back to storage
+            // This ensures config window loads the same defaults
+            for (const [key, value] of Object.entries(data)) {
+                localStorage.setItem(`schoolView-${key}`, value);
+            }
+        }
+
+        /**
+         * Updates the "View Mode" spans with new data
+         */
+        function updateViewFields(data) {
+            viewClass.textContent = data.class;
+            viewSection.textContent = data.section;
+            viewStrength.textContent = data.strength;
+            viewPresent.textContent = data.present;
+            // Calculated field
+            const strength = parseInt(data.strength) || 0;
+            const present = parseInt(data.present) || 0;
+            viewAbsent.textContent = strength - present;
+            viewPeriod.textContent = data.period;
+            viewSubject.textContent = data.subject;
+            viewTeacher.textContent = data.teacher;
+            
+            // Update theme
+            updateTheme(data.subject);
+        }
+        
+        /**
+         * Sets the clock hands
+         */
+        function setClock() {
+            const now = new Date();
+            
+            let hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            
+            const hoursStr = hours < 10 ? '0' + hours : hours;
+            const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+            const secondsStr = seconds < 10 ? '0' + seconds : seconds;
+
+            digitalClock.textContent = `${hoursStr}:${minutesStr}:${secondsStr}`;
+            digitalAmPm.textContent = ampm;
+        }
+
+        // --- Event Listeners ---
+        
+        // Load data when the app window opens
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            setClock();
+            setInterval(setClock, 1000); // Update clock every second
+        });
+
+        // --- Button Clicks ---
+        // Use the 'api' exposed from preload.js
+        closeBtn.addEventListener('click', () => window.api.closeApp());
+        editConfigBtn.addEventListener('click', () => window.api.openConfig());
+        
+        // --- IPC Listener ---
+        // Listen for data updates from the config window
+        window.api.onDataUpdated((data) => {
+            // 1. Save new data to localStorage
+            localStorage.setItem('schoolView-class', data.class);
+            localStorage.setItem('schoolView-section', data.section);
+            localStorage.setItem('schoolView-strength', data.strength);
+            localStorage.setItem('schoolView-present', data.present);
+            localStorage.setItem('schoolView-period', data.period);
+            localStorage.setItem('schoolView-subject', data.subject);
+            localStorage.setItem('schoolView-teacher', data.teacher);
+            
+            // 2. Update the view
+            updateViewFields(data);
+        });
+
+    </script>
+</body>
+</html>
+
