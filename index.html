@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SchoolView</title>
     <style>
-        /* Basic Reset */
         * {
             margin: 0;
             padding: 0;
@@ -13,13 +12,11 @@
         }
 
         body {
-            /* Default background color */
-            background-color: transparent; /* Neutral dark background */
+            background-color: transparent; 
             font-family: Georgia, 'Times New Roman', Times, serif;
             padding: 10px;
             user-select: none;
-            /* -webkit-app-region: drag; REMOVED to make window non-moveable */
-            transition: none; /* No transition on body */
+            transition: none;
             height: 100vh;
             overflow: hidden;
         }
@@ -70,14 +67,13 @@
             background: rgba(200, 0, 0, 0.8);
         }
         
-        /* --- UPDATED: Digital Clock Styles --- */
         .clock-container {
             width: 100%;
-            height: auto; /* Changed from 100px */
+            height: auto; 
             position: relative;
             margin: 0 auto 5px auto; /* Reduced bottom margin */
-            border: none; /* Removed border */
-            border-radius: 0; /* Removed border-radius */
+            border: none; 
+            border-radius: 0; 
             background: rgba(255, 255, 255, 0.2);
             padding: 8px 0; /* Reduced padding */
             border-radius: 8px;
@@ -142,8 +138,8 @@
             background-color: #3498db;
             color: white;
             width: 100%;
-            padding: 6px 12px; /* <-- REDUCED padding */
-            font-size: 0.85rem; /* <-- REDUCED font size */
+            padding: 6px 12px; 
+            font-size: 0.85rem;
         }
 
         #edit-config-btn:hover {
@@ -165,10 +161,9 @@
 <body>
 
     <div class="widget-container">
-        <!-- Custom Close Button -->
         <button id="close-btn" title="Close">x</button>
 
-        <!-- --- UPDATED: Live Digital Clock --- -->
+
         <div class="clock-container">
             <div id="digital-clock">00:00:00</div>
             <div id="digital-ampm">AM</div>
@@ -176,7 +171,6 @@
 
         <!-- View Mode: Displays the data -->
         <div class="view-mode" id="view-mode">
-            <!-- --- MODIFIED: Combined Class and Section --- -->
             <p>Class: <span id="view-class"></span> <span id="view-section"></span></p>
             <p>T. Strength: <span id="view-strength"></span></p>
             <p>Present: <span id="view-present"></span></p>
@@ -189,11 +183,10 @@
 
         <!-- Button Bar -->
         <div class="button-bar">
-            <!-- Combined Edit/Config Button -->
             <button class="btn" id="edit-config-btn">Edit / Config</button>
         </div>
 
-        <!-- --- ADDED: Credit Text --- -->
+
         <p class="credit-text">Made by KWE26 (Pritam) / Kiwi</p>
     </div>
 
@@ -231,16 +224,10 @@
         const viewSubject = document.getElementById('view-subject');
         const viewTeacher = document.getElementById('view-teacher');
         
-        // Clock Hands
+
         const digitalClock = document.getElementById('digital-clock'); // <-- ADDED
         const digitalAmPm = document.getElementById('digital-ampm'); // <-- ADDED
-        // --- REMOVED: hourHand, minuteHand, secondHand ---
-
-        // --- Functions ---
         
-        /**
-         * Determines if text color should be light or dark based on bg color
-         */
         function getTextColor(hexcolor){
             hexcolor = hexcolor.replace("#", "");
             const r = parseInt(hexcolor.substr(0,2),16);
@@ -250,23 +237,16 @@
             return (yiq >= 128) ? '#2c3e50' : '#ffffff';
         }
         
-        /**
-         * Updates the background and text color based on the subject
-         */
         function updateTheme(subject) {
             const color = subjectColors[subject] || subjectColors['Default'];
             const textColor = getTextColor(color);
             
-            // --- MODIFIED: Target widget container instead of body ---
             widgetContainer.style.backgroundColor = color;
             widgetContainer.style.color = textColor;
         }
 
-        /**
-         * Loads data from localStorage or sets defaults
-         */
         function loadData() {
-            // Get saved data or use new defaults
+
             const data = {
                 class: localStorage.getItem('schoolView-class') || 'IX',
                 section: localStorage.getItem('schoolView-section') || 'D',
@@ -277,26 +257,21 @@
                 teacher: localStorage.getItem('schoolView-teacher') || 'Rem', // Default Rem
             };
 
-            // 3. Set current date
+
             const today = new Date();
             const dateString = today.toLocaleDateString('en-GB', {
                 day: '2-digit', month: 'short', year: 'numeric'
             });
             viewDate.textContent = dateString;
 
-            // 4. Update view fields
+
             updateViewFields(data);
             
-            // 5. Save the (potentially default) data back to storage
-            // This ensures config window loads the same defaults
             for (const [key, value] of Object.entries(data)) {
                 localStorage.setItem(`schoolView-${key}`, value);
             }
         }
 
-        /**
-         * Updates the "View Mode" spans with new data
-         */
         function updateViewFields(data) {
             viewClass.textContent = data.class;
             viewSection.textContent = data.section;
@@ -345,15 +320,12 @@
             setInterval(setClock, 1000); // Update clock every second
         });
 
-        // --- Button Clicks ---
-        // Use the 'api' exposed from preload.js
+
         closeBtn.addEventListener('click', () => window.api.closeApp());
         editConfigBtn.addEventListener('click', () => window.api.openConfig());
         
-        // --- IPC Listener ---
-        // Listen for data updates from the config window
         window.api.onDataUpdated((data) => {
-            // 1. Save new data to localStorage
+
             localStorage.setItem('schoolView-class', data.class);
             localStorage.setItem('schoolView-section', data.section);
             localStorage.setItem('schoolView-strength', data.strength);
@@ -362,7 +334,7 @@
             localStorage.setItem('schoolView-subject', data.subject);
             localStorage.setItem('schoolView-teacher', data.teacher);
             
-            // 2. Update the view
+
             updateViewFields(data);
         });
 
