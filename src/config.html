@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0; 
+            background-color: #f4f4f4; 
+            color: #333; 
+            border: 1px solid #aaa; 
+            border-radius: 8px;
+            overflow: hidden; 
+            height: 100vh;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+        #title-bar {
+            width: 100%;
+            height: 32px;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            -webkit-app-region: drag; 
+            border-bottom: 1px solid #ccc;
+        }
+        #title-bar-title {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .title-bar-controls {
+            display: flex;
+            -webkit-app-region: no-drag; 
+        }
+        .title-bar-btn {
+            width: 20px;
+            height: 20px;
+            border: none;
+            border-radius: 50%;
+            margin-left: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #minimize-btn {
+            background-color: #f1c40f;
+        }
+        #minimize-btn:hover {
+            background-color: #f39c12;
+        }
+        #close-config-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        #close-config-btn:hover {
+            background-color: #c0392b;
+        }
+        .main-container {
+            display: flex;
+            height: calc(100vh - 32px);
+        }
+        #sidebar {
+            width: 150px;
+            background: #e8e8e8;
+            padding: 10px;
+            border-right: 1px solid #ccc;
+            flex-shrink: 0;
+            transition: background-color 0.4s ease;
+        }
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: #ddd;
+            border: none;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-align: left;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .nav-btn.active,
+        .nav-btn:hover {
+            background-color: #3498db;
+            color: white;
+        }
+        #content-area {
+            flex-grow: 1;
+            overflow: hidden;
+            position: relative;
+        }
+        .form-container {
+            padding: 15px 20px; 
+            height: calc(100vh - 32px - 70px); 
+            overflow-y: auto;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        #about-page, #break-image-page {
+            padding-top: 15px;
+        }
+        #about-page h3, #break-image-page h3, #custom-page h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        #about-page p {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.3rem; 
+            margin-top: 0;
+            margin-bottom: 15px; 
+        }
+        .form-group {
+            margin-bottom: 10px; 
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem; 
+            font-weight: bold;
+            margin-bottom: 4px; 
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 6px; 
+            border-radius: 4px; 
+            border: 1px solid #bdc3c7;
+            font-size: 0.9rem; 
+            box-sizing: border-box; 
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+        
+        .radio-grid-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 5px;
+        }
+        .radio-btn input[type="radio"] {
+            display: none; 
+        }
+        .radio-btn label {
+            display: block;
+            width: 100%;
+            padding: 8px 5px;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            background-color: inherit;
+            color: inherit;
+        }
+        .radio-btn input[type="radio"]:checked + label {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        body.theme-light .radio-btn input[type="radio"]:checked + label {
+            background-color: #ffffff;
+            color: #3498db;
+            border-color: #ffffff;
+        }
+        body.theme-dark .radio-btn input[type="radio"]:checked + label {
+            background-color: #2c3e50;
+            color: white;
+            border-color: #2c3e50;
+        }
+
+        body.theme-dark { color: #2c3e50; }
+        body.theme-light { color: #ffffff; }
+        
+        body.theme-dark h1,
+        body.theme-dark h3,
+        body.theme-dark .form-group label,
+        body.theme-dark .theme-editor-item label,
+        body.theme-dark .radio-btn label,
+        body.theme-dark #about-page p,
+        body.theme-dark #break-image-page label,
+        body.theme-dark .image-toggle-label {
+            color: #2c3e50;
+        }
+        body.theme-light h1,
+        body.theme-light h3,
+        body.theme-light .form-group label,
+        body.theme-light .theme-editor-item label,
+        body.theme-light .radio-btn label,
+        body.theme-light #about-page p,
+        body.theme-light #break-image-page label,
+        body.theme-light .image-toggle-label {
+            color: #ffffff;
+        }
+
+        body.theme-dark .form-group input,
+        body.theme-dark .form-group select,
+        body.theme-dark .theme-editor-item input[type="color"] {
+            background-color: #ffffff;
+            border-color: #bdc3c7;
+            color: #333;
+        }
+        body.theme-light .form-group input,
+        body.theme-light .form-group select,
+        body.theme-light .theme-editor-item input[type="color"],
+        body.theme-light .radio-btn label {
+            background-color: rgba(0,0,0,0.2);
+            border-color: rgba(255,255,255,0.5);
+            color: #ffffff;
+        }
+        
+        body.theme-dark .form-group select option {
+            background-color: #ffffff;
+            color: #333;
+        }
+        
+        body.theme-light .image-toggle {
+            filter: invert(1) brightness(1);
+        }
+
+        .theme-editor-subject-block {
+             border-bottom: 1px solid #ccc;
+             padding-bottom: 10px;
+             margin-bottom: 10px;
+        }
+        .theme-editor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .theme-editor-item label {
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+        .theme-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .theme-controls input[type="color"] {
+            width: 60px; 
+            height: 30px;
+            padding: 2px; 
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .image-toggle-label {
+            font-size: 0.8rem;
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        .image-toggle {
+            width: auto;
+            margin-right: 4px;
+        }
+        .image-select-container {
+            padding: 5px 0 0 0;
+            display: none;
+        }
+
+        .color-warning {
+            font-size: 0.75rem;
+            color: #e74c3c;
+            display: none;
+            text-align: right;
+            margin-top: 3px;
+        }
+
+        .image-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .image-option input[type="radio"] {
+            display: none;
+        }
+        .image-option img {
+            width: 100%;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .image-option input[type="radio"]:checked + img {
+            border-color: #3498db;
+        }
+        body.theme-light .image-option input[type="radio"]:checked + img {
+            border-color: #ffffff;
+        }
+
+        .button-bar {
+            display: flex;
+            justify-content: space-between;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px; 
+            padding: 15px 20px; 
+            background-color: #f4f4f4; 
+            border-top: 1px solid #ccc;
+            box-sizing: border-box;
+            align-items: center; 
+            transition: background-color 0.4s ease;
+        }
+        .btn {
+            padding: 8px 12px; 
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem; 
+            font-weight: bold;
+            transition: background 0.2s, transform 0.1s;
+            width: 48%;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        #save-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        #save-btn:hover {
+            background-color: #27ae60;
+        }
+        #cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        #cancel-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div id="title-bar">
+        <div id="title-bar-title">Configuration</div>
+        <div class="title-bar-controls">
+            <button class="title-bar-btn" id="minimize-btn" title="Minimize">-</button>
+            <button class="title-bar-btn" id="close-config-btn" title="Close">x</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div id="sidebar">
+            <button class="nav-btn active" data-page="config-page">Config</button>
+            <button class="nav-btn" data-page="custom-page">Customize</button>
+            <button class="nav-btn" data-page="break-image-page">Brk Img</button>
+            <button class="nav-btn" data-page="about-page">About</button>
+        </div>
+
+        <div id="content-area">
+            <div class="form-container">
+                
+                <div class="page active" id="config-page">
+                    <h1>Edit Details</h1>
+                    <div class="form-group">
+                        <label for="edit-class">Class</label>
+                        <select id="edit-class"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-section">Section</label>
+                        <select id="edit-section"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-strength">T. Strength</label>
+                        <input type="number" id="edit-strength" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-present">Present</label>
+                        <input type="number" id="edit-present" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Period</label>
+                        <div class="radio-grid-group" id="edit-period-grid">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-subject">Subject</label>
+                        <select id="edit-subject"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Teacher Input Method</label>
+                        <div class="radio-grid-group" style="grid-template-columns: 1fr 1fr;">
+                            <div class="radio-btn">
+                                <input type="radio" id="teacher-select-radio" name="teacher-method" value="select">
+                                <label for="teacher-select-radio">Select</label>
+                            </div>
+                            <div class="radio-btn">
+                                <input type="radio" id="teacher-manual-radio" name="teacher-method" value="manual" checked>
+                                <label for="teacher-manual-radio">Manual</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="teacher-select-group" style="display: none;">
+                        <label for="edit-teacher-select">Subject Teacher (Select)</label>
+                        <select id="edit-teacher-select"></select>
+                    </div>
+                    <div class="form-group" id="teacher-manual-group">
+                        <label for="edit-teacher-manual">Subject Teacher (Manual)</label>
+                        <input type="text" id="edit-teacher-manual" placeholder="Teacher Name">
+                    </div>
+                </div>
+
+                <div class="page" id="custom-page">
+                    <h3>Theme Customization</h3>
+                    <div class="form-group">
+                        <div id="theme-editor-container">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="break-image-page">
+                    <h3>Break Background</h3>
+                    <div class="form-group">
+                        <label>Select an image for break time</label>
+                        <div class="image-selection-grid" id="break-image-grid">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page" id="about-page">
+                    <h3>SchoolView</h3>
+                    <p>Version 1.0.0</p>
+                    <p>A simple desktop widget for managing class details.</p>
+                    <p>Made by KWE26 (Pritam) / Kiwi</p>
+                </div>
+
+            </div>
+            
+            <div class="button-bar">
+                <button class="btn" id="save-btn">Save</button>
+                <button class="btn" id="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const defaultSubjectColors = {
+            'Maths': '#2980b9',
+            'Science': '#27ae60',
+            'Physics': '#2980b9',
+            'Chemistry': '#8e44ad',
+            'Bio': '#16a085',
+            'English': '#c0392b',
+            'History': '#8e44ad',
+            'Geo': '#16a085',
+            'Civics': '#d35400',
+            'Economics': '#e67e22',
+            'Social Science': '#795548',
+            'AI': '#2c3e50',
+            'P.ED': '#5D6D7E',
+            'Library': '#34495e',
+            'Odia': '#006266',
+            'Hindi': '#9b59b6',
+            'Break': '#4e54c8',
+            'Default': '#5D6D7E'
+        };
+        let subjectColors = {};
+        let currentThemeState = {}; 
+        
+        const breakImages = [
+            './assets/mitsuba.png',
+            './assets/fly.png',
+            './assets/flowera.png',
+            './assets/ruby_a.png',
+            './assets/ruby_b.png',
+            './assets/star.png',
+        ];
+
+        const classes = ['VIII', 'IX', 'X'];
+        const sections = ['A', 'B', 'C', 'D', 'E', 'F'];
+        const subjects = []; 
+        
+        const teacherList = [
+            "Bijaylaxmi Mam",
+            "Suren Sir",
+            "Biswajit Sir",
+            "Suvendu Sir",
+            "Minati Mam",
+            "Sarmistha Mam",
+            "Ananya Mam",
+            "Paresh Sir",
+        ];
+
+        const saveBtn = document.getElementById('save-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const minimizeBtn = document.getElementById('minimize-btn');
+        const closeConfigBtn = document.getElementById('close-config-btn');
+        const themeEditorContainer = document.getElementById('theme-editor-container');
+
+        const editClass = document.getElementById('edit-class');
+        const editSection = document.getElementById('edit-section');
+        const editStrength = document.getElementById('edit-strength');
+        const editPresent = document.getElementById('edit-present');
+        const editSubject = document.getElementById('edit-subject');
+        
+        const teacherSelectRadio = document.getElementById('teacher-select-radio');
+        const teacherManualRadio = document.getElementById('teacher-manual-radio');
+        const teacherSelectGroup = document.getElementById('teacher-select-group');
+        const teacherManualGroup = document.getElementById('teacher-manual-group');
+        const editTeacherSelect = document.getElementById('edit-teacher-select');
+        const editTeacherManual = document.getElementById('edit-teacher-manual');
+
+        
+        function populateSelect(selectElement, optionsArray, selectedValue = null) {
+            selectElement.innerHTML = '';
+            optionsArray.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = (typeof option === 'object' ? option.value : option);
+                opt.textContent = (typeof option === 'object' ? option.text : option);
+                selectElement.appendChild(opt);
+            });
+            if (selectedValue) {
+                selectElement.value = selectedValue;
+            }
+        }
+
+        function createPeriodButtons() {
+            const container = document.getElementById('edit-period-grid');
+            container.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            const periods = ['1st', '2nd', '3rd', '4th', 'Break', '5th', '6th', '7th', '8th'];
+            let html = '';
+            periods.forEach((p, i) => {
+                const periodValue = (p === 'Break') ? 'Break' : `${p} Period`;
+                const id = `period-${i}`;
+                html += `
+                    <div class="radio-btn">
+                        <input type="radio" id="${id}" name="period-radio" value="${periodValue}">
+                        <label for="${id}">${p}</label>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function createBreakImageSelector() {
+            const container = document.getElementById('break-image-grid');
+            let html = '';
+            breakImages.forEach((url, i) => {
+                const id = `break-img-${i}`;
+                const fileName = url.split('/').pop();
+                html += `
+                    <label class="image-option" for="${id}" title="${fileName}">
+                        <input type="radio" id="${id}" name="break-image-radio" value="${url}">
+                        <img src="${url}" alt="${fileName}" onerror="this.src='https://placehold.co/100x70/000/fff?text=Error'">
+                    </label>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function createSubjectImageSelector(subject, containerId, selectedUrl = null) {
+            const container = document.getElementById(containerId);
+            let html = '<div class="image-selection-grid">';
+            breakImages.forEach((url, i) => {
+                const id = `subject-${subject}-img-${i}`;
+                const fileName = url.split('/').pop();
+                const isChecked = url === selectedUrl ? 'checked' : '';
+                html += `
+                    <label class="image-option" for="${id}" title="${fileName}">
+                        <input type="radio" id="${id}" name="subject-${subject}-image-radio" value="${url}" ${isChecked}>
+                        <img src="${url}" alt="${fileName}" onerror="this.src='https://placehold.co/80x60/000/fff?text=Error'">
+                    </label>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+
+            container.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                         currentThemeState[subject] = { type: 'image', value: e.target.value };
+                         updateConfigTheme(editSubject.value); 
+                    }
+                });
+            });
+        }
+
+
+        function getTextColor(hexcolor){
+            if (!hexcolor || typeof hexcolor !== 'string') return '#ffffff';
+            hexcolor = hexcolor.replace("#", "");
+            if (hexcolor.length !== 6) return '#ffffff'; 
+            const r = parseInt(hexcolor.substr(0,2),16);
+            const g = parseInt(hexcolor.substr(2,2),16);
+            const b = parseInt(hexcolor.substr(4,2),16);
+            const yiq = ((r*299)+(g*587)+(b*114))/1000;
+            return (yiq >= 128) ? '#2c3e50' : '#ffffff';
+        }
+        
+        function darkenColor(hex, percent) {
+            if (!hex || typeof hex !== 'string') return '#000000';
+            hex = hex.replace('#','');
+            if (hex.length !== 6) return '#000000'; 
+            let r = parseInt(hex.substring(0,2), 16);
+            let g = parseInt(hex.substring(2,4), 16);
+            let b = parseInt(hex.substring(4,6), 16);
+            r = Math.max(0, Math.floor(r * (100 - percent) / 100));
+            g = Math.max(0, Math.floor(g * (100 - percent) / 100));
+            b = Math.max(0, Math.floor(b * (100 - percent) / 100));
+            return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).padStart(6, '0')}`;
+        }
+
+        function lightenColor(hex, percent) {
+             if (!hex || typeof hex !== 'string') return '#ffffff';
+            hex = hex.replace("#", "");
+            if (hex.length !== 6) return '#ffffff'; 
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+            const newR = Math.min(255, Math.floor(r + (255 - r) * (percent / 100)));
+            const newG = Math.min(255, Math.floor(g + (255 - g) * (percent / 100)));
+            const newB = Math.min(255, Math.floor(b + (255 - b) * (percent / 100)));
+            const newHexR = newR.toString(16).padStart(2, '0');
+            const newHexG = newG.toString(16).padStart(2, '0');
+            const newHexB = newB.toString(16).padStart(2, '0');
+            return `#${newHexR}${newHexG}${newHexB}`;
+        }
+
+        function updateConfigTheme(subject) {
+            const buttonBar = document.querySelector('.button-bar');
+            const titleBar = document.getElementById('title-bar');
+            const sidebar = document.getElementById('sidebar');
+            
+            let theme = currentThemeState[subject] || { type: 'color', value: subjectColors[subject] || defaultSubjectColors[subject] || defaultSubjectColors['Default'] };
+
+            if (subject === 'Break') {
+                theme = { type: 'color', value: subjectColors['Break'] || defaultSubjectColors['Break'] };
+            }
+
+            if (theme.type === 'image') {
+                document.body.style.background = `url(${theme.value}) center center / cover no-repeat`;
+                document.body.classList.remove('theme-dark');
+                document.body.classList.add('theme-light'); 
+                buttonBar.style.backgroundColor = 'rgba(0,0,0,0.5)'; 
+                titleBar.style.backgroundColor = 'rgba(0,0,0,0.3)';
+                sidebar.style.backgroundColor = 'rgba(0,0,0,0.3)';
+            } else {
+                 const color = theme.value;
+                 const isDarkText = getTextColor(color) === '#2c3e50';
+                
+                 document.body.style.background = color; 
+                 document.body.classList.toggle('theme-dark', isDarkText);
+                 document.body.classList.toggle('theme-light', !isDarkText);
+                
+                 if (isDarkText) {
+                     buttonBar.style.backgroundColor = '#f4f4f4'; 
+                     titleBar.style.backgroundColor = '#e0e0e0';
+                     sidebar.style.backgroundColor = '#e8e8e8';
+                 } else {
+                     buttonBar.style.backgroundColor = 'rgba(0,0,0,0.2)'; 
+                     titleBar.style.backgroundColor = 'rgba(0,0,0,0.1)';
+                     sidebar.style.backgroundColor = 'rgba(0,0,0,0.1)';
+                 }
+            }
+        }
+
+        function loadAndApplyColors() {
+            subjectColors = {}; 
+            currentThemeState = {};
+            const themeEditorHTML = [];
+            
+            const allSubjects = Object.keys(defaultSubjectColors);
+            
+            subjects.length = 0; 
+            subjects.push(...allSubjects.filter(s => !['Break', 'Default'].includes(s)));
+            subjects.push('Break'); 
+
+            allSubjects.forEach(subject => {
+                if (subject === 'Default') return; 
+
+                const savedColor = localStorage.getItem('schoolView-color-' + subject) || defaultSubjectColors[subject];
+                subjectColors[subject] = savedColor;
+                
+                const savedThemeType = localStorage.getItem(`schoolView-themeType-${subject}`) || 'color';
+                const savedThemeValue = savedThemeType === 'image' 
+                    ? localStorage.getItem(`schoolView-themeImage-${subject}`) || breakImages[0] 
+                    : savedColor;
+                
+                currentThemeState[subject] = { type: savedThemeType, value: savedThemeValue };
+
+                let controlsHTML = '';
+                let imageSelectHTML = '';
+                
+                if (subject !== 'Break') {
+                     const isImageChecked = savedThemeType === 'image';
+                     const colorDisplayStyle = isImageChecked ? 'none' : 'block';
+                     const imageDisplayStyle = isImageChecked ? 'block' : 'none';
+
+                    controlsHTML = `
+                        <div class="theme-controls">
+                            <input type="color" id="color-${subject}" value="${savedColor}" style="display: ${colorDisplayStyle};">
+                            <label class="image-toggle-label">
+                                <input type="checkbox" id="image-toggle-${subject}" class="image-toggle" ${isImageChecked ? 'checked' : ''}> Use Img
+                            </label>
+                        </div>
+                    `;
+                    imageSelectHTML = `
+                        <div class="image-select-container" id="image-select-container-${subject}" style="display: ${imageDisplayStyle};">
+                            <!-- Image previews will be injected here -->
+                        </div>
+                    `;
+                } else {
+                    controlsHTML = `<input type="color" id="color-${subject}" value="${savedColor}">`;
+                }
+
+                themeEditorHTML.push(`
+                    <div class="theme-editor-subject-block">
+                        <div class="theme-editor-item">
+                            <label for="color-${subject}">${subject}</label>
+                            ${controlsHTML}
+                        </div>
+                        ${imageSelectHTML}
+                        <small class="color-warning" id="warning-${subject}">Color is too light! Forcing darker shade.</small>
+                    </div>
+                `);
+            });
+            
+            subjectColors['Default'] = localStorage.getItem('schoolView-color-Default') || defaultSubjectColors['Default'];
+
+            themeEditorContainer.innerHTML = themeEditorHTML.join('');
+            
+            allSubjects.forEach(subject => {
+                if (subject === 'Default') return;
+
+                const colorInput = document.getElementById(`color-${subject}`);
+                const warning = document.getElementById(`warning-${subject}`);
+                
+                colorInput.addEventListener('input', (e) => {
+                    subjectColors[subject] = e.target.value; 
+                    currentThemeState[subject] = { type: 'color', value: e.target.value };
+                    if (editSubject.value === subject) {
+                        updateConfigTheme(subject);
+                    }
+                });
+
+                colorInput.addEventListener('change', (e) => {
+                    let color = e.target.value;
+                    if (getTextColor(color) === '#2c3e50') {
+                        color = darkenColor(color, 40);
+                        e.target.value = color;
+                        subjectColors[subject] = color; 
+                        currentThemeState[subject] = { type: 'color', value: color };
+                        if (editSubject.value === subject) {
+                            updateConfigTheme(subject);
+                        }
+                        warning.style.display = 'block';
+                        setTimeout(() => { warning.style.display = 'none'; }, 2000);
+                    } else {
+                        warning.style.display = 'none';
+                    }
+                });
+
+                if (subject !== 'Break') {
+                    const toggle = document.getElementById(`image-toggle-${subject}`);
+                    const colorInput = document.getElementById(`color-${subject}`);
+                    const imageContainer = document.getElementById(`image-select-container-${subject}`);
+                    const savedThemeType = currentThemeState[subject].type;
+                    const savedThemeValue = currentThemeState[subject].value;
+
+                    createSubjectImageSelector(subject, `image-select-container-${subject}`, savedThemeType === 'image' ? savedThemeValue : null);
+
+                    toggle.addEventListener('change', (e) => {
+                        const useImage = e.target.checked;
+                        colorInput.style.display = useImage ? 'none' : 'block';
+                        imageContainer.style.display = useImage ? 'block' : 'none';
+                        if (useImage) {
+                            const selectedImageRadio = imageContainer.querySelector('input[type="radio"]:checked');
+                            currentThemeState[subject] = { type: 'image', value: selectedImageRadio ? selectedImageRadio.value : breakImages[0] };
+                        } else {
+                            currentThemeState[subject] = { type: 'color', value: colorInput.value };
+                        }
+                         if (editSubject.value === subject) {
+                             updateConfigTheme(subject);
+                         }
+                    });
+                }
+            });
+        }
+        
+        function handlePeriodChange() {
+            const selectedPeriod = document.querySelector('input[name="period-radio"]:checked')?.value;
+            if (selectedPeriod === 'Break') {
+                editSubject.value = 'Break';
+                editSubject.dispatchEvent(new Event('change'));
+            }
+        }
+
+        function loadData() {
+            loadAndApplyColors();
+            createPeriodButtons();
+            createBreakImageSelector();
+
+            const periodRadios = document.querySelectorAll('input[name="period-radio"]');
+            periodRadios.forEach(radio => {
+                radio.addEventListener('change', handlePeriodChange);
+            });
+
+            populateSelect(editClass, classes);
+            populateSelect(editSection, sections);
+            populateSelect(editSubject, subjects); 
+            populateSelect(editTeacherSelect, teacherList);
+            
+            editClass.value = localStorage.getItem('schoolView-class') || 'IX';
+            editSection.value = localStorage.getItem('schoolView-section') || 'D';
+            editStrength.value = localStorage.getItem('schoolView-strength') || '39';
+            editPresent.value = localStorage.getItem('schoolView-present') || '0';
+            
+            const savedPeriod = localStorage.getItem('schoolView-period') || '1st Period';
+            const periodRadio = document.querySelector(`input[name="period-radio"][value="${savedPeriod}"]`);
+            if (periodRadio) {
+                periodRadio.checked = true;
+            } else {
+                document.getElementById('period-0').checked = true;
+            }
+            
+            const savedSubject = localStorage.getItem('schoolView-subject') || 'Maths';
+            editSubject.value = savedSubject;
+            
+            const savedTeacher = localStorage.getItem('schoolView-teacher') || 'Rem';
+
+            if (teacherList.length > 0 && teacherList.includes(savedTeacher)) {
+                editTeacherSelect.value = savedTeacher;
+                teacherSelectRadio.checked = true;
+                teacherManualRadio.checked = false;
+                teacherSelectGroup.style.display = 'block';
+                teacherManualGroup.style.display = 'none';
+            } else {
+                editTeacherManual.value = savedTeacher;
+                teacherSelectRadio.checked = false;
+                teacherManualRadio.checked = true;
+                teacherSelectGroup.style.display = 'none';
+                teacherManualGroup.style.display = 'block';
+            }
+            
+            if (teacherList.length > 0) {
+                 teacherSelectRadio.disabled = false;
+            } else {
+                teacherSelectRadio.disabled = true;
+                teacherManualRadio.checked = true;
+                teacherSelectGroup.style.display = 'none';
+                teacherManualGroup.style.display = 'block';
+            }
+
+            const savedBreakImg = localStorage.getItem('schoolView-breakImage') || breakImages[0];
+            const breakImgRadio = document.querySelector(`input[name="break-image-radio"][value="${savedBreakImg}"]`);
+            if (breakImgRadio) {
+                breakImgRadio.checked = true;
+            } else if (breakImages.length > 0) {
+                document.getElementById('break-img-0').checked = true;
+            }
+            
+            updateConfigTheme(savedSubject);
+        }
+        
+        function handleSave() {
+            const teacherValue = teacherManualRadio.checked 
+                ? editTeacherManual.value 
+                : editTeacherSelect.value;
+            
+            const selectedPeriod = document.querySelector('input[name="period-radio"]:checked')?.value || '1st Period';
+
+            const data = {
+                class: editClass.value,
+                section: editSection.value,
+                strength: editStrength.value,
+                present: editPresent.value,
+                period: selectedPeriod, 
+                subject: editSubject.value,
+                teacher: teacherValue, 
+            };
+
+            Object.keys(currentThemeState).forEach(subject => {
+                 const theme = currentThemeState[subject];
+                 localStorage.setItem(`schoolView-themeType-${subject}`, theme.type);
+                 if (theme.type === 'image') {
+                     localStorage.setItem(`schoolView-themeImage-${subject}`, theme.value);
+                     const colorInput = document.getElementById(`color-${subject}`);
+                     if (colorInput) {
+                        localStorage.setItem(`schoolView-color-${subject}`, colorInput.value); 
+                     } else if(subject === 'Break') {
+                         localStorage.setItem(`schoolView-color-Break`, subjectColors['Break'] || defaultSubjectColors['Break']);
+                     }
+                 } else {
+                     localStorage.setItem(`schoolView-color-${subject}`, theme.value);
+                 }
+            });
+
+            const selectedBreakImg = document.querySelector('input[name="break-image-radio"]:checked')?.value || breakImages[0];
+            localStorage.setItem('schoolView-breakImage', selectedBreakImg);
+            
+            window.api.saveData(data);
+        }
+
+        function handleNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            const pages = document.querySelectorAll('.page');
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetPageId = button.dataset.page;
+
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    pages.forEach(page => {
+                        if (page.id === targetPageId) {
+                            page.classList.add('active');
+                        } else {
+                            page.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            handleNavigation();
+        });
+        saveBtn.addEventListener('click', handleSave);
+        cancelBtn.addEventListener('click', () => window.api.closeConfig());
+        
+        minimizeBtn.addEventListener('click', () => window.api.minimizeConfig());
+        closeConfigBtn.addEventListener('click', () => window.api.closeConfig());
+        
+        editSubject.addEventListener('change', (e) => {
+            updateConfigTheme(e.target.value);
+        });
+        
+        teacherSelectRadio.addEventListener('change', () => {
+            if (teacherSelectRadio.checked) {
+                teacherSelectGroup.style.display = 'block';
+                teacherManualGroup.style.display = 'none';
+            }
+        });
+        teacherManualRadio.addEventListener('change', () => {
+            if (teacherManualRadio.checked) {
+                teacherSelectGroup.style.display = 'none';
+                teacherManualGroup.style.display = 'block';
+            }
+        });
+        
+    </script>
+</body>
+</html>
+

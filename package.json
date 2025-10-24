@@ -1,13 +1,13 @@
 {
   "name": "schoolview",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A desktop widget for school class management.",
   "main": "index.js",
   "private": true,
   "author": "Kiwi",
   "devDependencies": {
     "@types/bun": "latest",
-    "electron": "14.0.0",
+    "electron": "14",
     "electron-builder": "^22.11.7"
   },
   "scripts": {

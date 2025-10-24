@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background-color: transparent; 
             font-family: Georgia, 'Times New Roman', Times, serif;
@@ -20,30 +19,42 @@
             height: 100vh;
             overflow: hidden;
         }
-
         .widget-container {
             width: 100%;
             height: 100%;
-            /* This is what will change color now */
-            background-color: #7f8c8d;
+            background-color: #34495e;
             color: #ffffff;
-            transition: background-color 0.4s ease, color 0.4s ease;
-            
+            transition: background 0.4s ease, color 0.4s ease;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            padding: 15px; /* Reduced padding */
+            padding: 15px; 
             padding-top: 15px;
             overflow: hidden; 
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 1;
         }
-
-        /* Make all buttons non-draggable */
+        .widget-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            background-image: none;
+            filter: blur(4px);
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.4s ease, background-image 0s;
+            background-color: rgba(0,0,0,0.3);
+        }
         button, input, select {
             -webkit-app-region: no-drag;
         }
-
-        /* Custom Close Button */
         #close-btn {
             position: absolute;
             top: 20px;
@@ -62,64 +73,61 @@
             transition: background 0.2s;
             z-index: 100;
         }
-
         #close-btn:hover {
             background: rgba(200, 0, 0, 0.8);
         }
-        
         .clock-container {
             width: 100%;
             height: auto; 
             position: relative;
-            margin: 0 auto 5px auto; /* Reduced bottom margin */
+            margin: 0 auto 5px auto; 
             border: none; 
-            border-radius: 0; 
             background: rgba(255, 255, 255, 0.2);
-            padding: 8px 0; /* Reduced padding */
+            padding: 8px 0; 
             border-radius: 8px;
         }
-
         #digital-clock {
             font-family: 'Arial', sans-serif;
-            font-size: 2.2rem; /* Reduced font size */
+            font-size: 2.2rem; 
             font-weight: bold;
             text-align: center;
             letter-spacing: 2px;
             text-shadow: 0 0 5px rgba(0,0,0,0.1);
         }
-        
         #digital-ampm {
             font-family: 'Arial', sans-serif;
-            font-size: 0.9rem; /* Reduced font size */
+            font-size: 0.9rem; 
             font-weight: bold;
             text-align: center;
         }
-
-        /* --- REMOVED: Analog clock styles (.clock-face, .clock-center, .hand, etc) --- */
-
-        /* View Mode Styling */
         .view-mode {
-            margin-top: 5px; /* Reduced margin */
+            margin-top: 5px; 
         }
         .view-mode p {
-            font-size: 0.95rem; /* <-- REDUCED font size */
-            margin-bottom: 4px; /* <-- REDUCED margin */
+            font-size: 0.95rem; 
+            margin-bottom: 4px; 
             font-weight: bold;
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
         }
-
         .view-mode p span {
             font-weight: normal;
             margin-left: 8px;
         }
-
-        /* Button Bar */
+        .break-mode-text {
+            display: none;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-align: center;
+            margin: auto 0;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
         .button-bar {
-            margin-top: auto; /* Pushes button to the bottom */
+            margin-top: auto; 
             display: flex;
             justify-content: center;
         }
-
         .btn {
             padding: 8px 12px;
             border: none;
@@ -129,11 +137,9 @@
             font-weight: bold;
             transition: background 0.2s, transform 0.1s;
         }
-
         .btn:active {
             transform: scale(0.98);
         }
-
         #edit-config-btn {
             background-color: #3498db;
             color: white;
@@ -141,35 +147,28 @@
             padding: 6px 12px; 
             font-size: 0.85rem;
         }
-
         #edit-config-btn:hover {
             background-color: #2980b9;
         }
-        
-        /* --- ADDED: Credit Text Style --- */
         .credit-text {
             font-family: Arial, sans-serif;
-            font-size: 0.6rem; /* Very small */
+            font-size: 0.6rem; 
             text-align: center;
-            color: currentColor; /* Inherit color from container */
+            color: currentColor; 
             opacity: 0.7;
-            margin-top: 5px; /* Small space from button */
+            margin-top: 5px; 
         }
-
     </style>
 </head>
 <body>
-
     <div class="widget-container">
         <button id="close-btn" title="Close">x</button>
-
 
         <div class="clock-container">
             <div id="digital-clock">00:00:00</div>
             <div id="digital-ampm">AM</div>
         </div>
 
-        <!-- View Mode: Displays the data -->
         <div class="view-mode" id="view-mode">
             <p>Class: <span id="view-class"></span> <span id="view-section"></span></p>
             <p>T. Strength: <span id="view-strength"></span></p>
@@ -179,41 +178,46 @@
             <p>Period: <span id="view-period"></span></p>
             <p>Subject: <span id="view-subject"></span></p>
             <p>S.T.: <span id="view-teacher"></span></p>
+            
+            <p class="break-mode-text" id="break-text">Break Time!</p>
         </div>
 
-        <!-- Button Bar -->
         <div class="button-bar">
             <button class="btn" id="edit-config-btn">Edit / Config</button>
         </div>
-
 
         <p class="credit-text">Made by KWE26 (Pritam) / Kiwi</p>
     </div>
 
     <script>
-        // --- Subject Colors ---
-        const subjectColors = {
+        let subjectColors = {};
+        const defaultSubjectColors = {
             'Maths': '#2980b9',
             'Science': '#27ae60',
-            'English': '#f39c12',
+            'Physics': '#2980b9',
+            'Chemistry': '#8e44ad',
+            'Bio': '#16a085',
+            'English': '#c0392b',
             'History': '#8e44ad',
             'Geo': '#16a085',
             'Civics': '#d35400',
-            'Economics': '#c0392b',
+            'Economics': '#e67e22',
+            'Social Science': '#795548',
             'AI': '#2c3e50',
-            'P.ED': '#7f8c8d',
-            'Library': '#95a5a6',
-            'Odia': '#f1c40f',
-            'Hindi': '#e67e22',
-            'Default': '#7f8c8d'
+            'P.ED': '#5D6D7E',
+            'Library': '#34495e',
+            'Odia': '#006266',
+            'Hindi': '#9b59b6',
+            'Break': '#4e54c8',
+            'Default': '#5D6D7E'
         };
 
-        // --- DOM Elements ---
-        const widgetContainer = document.querySelector('.widget-container'); // <-- ADDED
+        const widgetContainer = document.querySelector('.widget-container'); 
         const closeBtn = document.getElementById('close-btn');
         const editConfigBtn = document.getElementById('edit-config-btn');
+        const viewModeContent = document.getElementById('view-mode');
+        const breakText = document.getElementById('break-text');
 
-        // View Spans
         const viewClass = document.getElementById('view-class');
         const viewSection = document.getElementById('view-section');
         const viewStrength = document.getElementById('view-strength');
@@ -224,9 +228,8 @@
         const viewSubject = document.getElementById('view-subject');
         const viewTeacher = document.getElementById('view-teacher');
         
-
-        const digitalClock = document.getElementById('digital-clock'); // <-- ADDED
-        const digitalAmPm = document.getElementById('digital-ampm'); // <-- ADDED
+        const digitalClock = document.getElementById('digital-clock'); 
+        const digitalAmPm = document.getElementById('digital-ampm'); 
         
         function getTextColor(hexcolor){
             hexcolor = hexcolor.replace("#", "");
@@ -237,26 +240,112 @@
             return (yiq >= 128) ? '#2c3e50' : '#ffffff';
         }
         
+        function loadAndApplyColors() {
+            subjectColors = {};
+            for (const subject in defaultSubjectColors) {
+                const savedColor = localStorage.getItem('schoolView-color-' + subject) || defaultSubjectColors[subject];
+                subjectColors[subject] = savedColor;
+            }
+        }
+
         function updateTheme(subject) {
-            const color = subjectColors[subject] || subjectColors['Default'];
-            const textColor = getTextColor(color);
+            loadAndApplyColors();
             
-            widgetContainer.style.backgroundColor = color;
-            widgetContainer.style.color = textColor;
+            const regularFields = viewModeContent.querySelectorAll('p:not(.break-mode-text)');
+            const pseudoStyleSheet = document.styleSheets[0];
+            
+            const themeType = localStorage.getItem(`schoolView-themeType-${subject}`) || 'color';
+            let breakImgUrl = '';
+            
+            if (subject === 'Break') {
+                breakImgUrl = localStorage.getItem('schoolView-breakImage') || '';
+            } else if (themeType === 'image') {
+                breakImgUrl = localStorage.getItem(`schoolView-themeImage-${subject}`) || '';
+            }
+
+            if ((subject === 'Break' || themeType === 'image') && breakImgUrl) {
+                widgetContainer.style.background = 'rgba(0,0,0,0.3)';
+                widgetContainer.style.color = '#ffffff';
+
+                try {
+                    for (let i = 0; i < pseudoStyleSheet.cssRules.length; i++) {
+                        if (pseudoStyleSheet.cssRules[i].selectorText === '.widget-container::before') {
+                            pseudoStyleSheet.deleteRule(i);
+                            break;
+                        }
+                    }
+                } catch (e) {}
+                
+                pseudoStyleSheet.insertRule(`
+                    .widget-container::before {
+                        content: '';
+                        position: absolute;
+                        top: 0; left: 0; right: 0; bottom: 0;
+                        z-index: -1;
+                        background-size: cover;
+                        background-position: center;
+                        filter: blur(4px);
+                        border-radius: inherit;
+                        background-color: rgba(0,0,0,0.3);
+                        background-image: url("${breakImgUrl}");
+                        opacity: 1;
+                        transition: opacity 0.4s ease, background-image 0s;
+                    }
+                `, pseudoStyleSheet.cssRules.length);
+                
+                regularFields.forEach(p => p.style.display = (subject === 'Break' ? 'none' : 'block'));
+                breakText.style.display = (subject === 'Break' ? 'block' : 'none');
+                
+            } else {
+                const color = subjectColors[subject] || subjectColors['Default'];
+                const textColor = getTextColor(color);
+                
+                widgetContainer.style.background = color;
+                widgetContainer.style.color = textColor;
+                
+                 try {
+                    for (let i = 0; i < pseudoStyleSheet.cssRules.length; i++) {
+                        if (pseudoStyleSheet.cssRules[i].selectorText === '.widget-container::before') {
+                            pseudoStyleSheet.deleteRule(i);
+                            break;
+                        }
+                    }
+                } catch (e) {}
+
+                pseudoStyleSheet.insertRule(`
+                    .widget-container::before {
+                        content: '';
+                        position: absolute;
+                        top: 0; left: 0; right: 0; bottom: 0;
+                        z-index: -1;
+                        background-size: cover;
+                        background-position: center;
+                        filter: blur(4px);
+                        border-radius: inherit;
+                        background-color: rgba(0,0,0,0.3);
+                        background-image: none;
+                        opacity: 0;
+                        transition: opacity 0.4s ease, background-image 0s;
+                    }
+                `, pseudoStyleSheet.cssRules.length);
+                
+                regularFields.forEach(p => p.style.display = 'block');
+                breakText.style.display = 'none';
+            }
         }
 
         function loadData() {
+            loadAndApplyColors(); 
 
             const data = {
                 class: localStorage.getItem('schoolView-class') || 'IX',
                 section: localStorage.getItem('schoolView-section') || 'D',
                 strength: localStorage.getItem('schoolView-strength') || '39',
-                present: localStorage.getItem('schoolView-present') || '0', // Default 0
+                present: localStorage.getItem('schoolView-present') || '0', 
                 period: localStorage.getItem('schoolView-period') || '1st Period',
-                subject: localStorage.getItem('schoolView-subject') || 'Maths', // Default Maths
-                teacher: localStorage.getItem('schoolView-teacher') || 'Rem', // Default Rem
+                subject: localStorage.getItem('schoolView-subject') || 'Maths', 
+                teacher: localStorage.getItem('schoolView-teacher') || 'Rem', 
             };
-
 
             const today = new Date();
             const dateString = today.toLocaleDateString('en-GB', {
@@ -264,11 +353,12 @@
             });
             viewDate.textContent = dateString;
 
-
             updateViewFields(data);
             
             for (const [key, value] of Object.entries(data)) {
-                localStorage.setItem(`schoolView-${key}`, value);
+                if (!localStorage.getItem(`schoolView-${key}`)) {
+                    localStorage.setItem(`schoolView-${key}`, value);
+                }
             }
         }
 
@@ -277,21 +367,16 @@
             viewSection.textContent = data.section;
             viewStrength.textContent = data.strength;
             viewPresent.textContent = data.present;
-            // Calculated field
             const strength = parseInt(data.strength) || 0;
             const present = parseInt(data.present) || 0;
-            viewAbsent.textContent = strength - present;
+            viewAbsent.textContent = (strength - present).toString();
             viewPeriod.textContent = data.period;
             viewSubject.textContent = data.subject;
             viewTeacher.textContent = data.teacher;
             
-            // Update theme
             updateTheme(data.subject);
         }
         
-        /**
-         * Sets the clock hands
-         */
         function setClock() {
             const now = new Date();
             
@@ -301,7 +386,7 @@
             const ampm = hours >= 12 ? 'PM' : 'AM';
             
             hours = hours % 12;
-            hours = hours ? hours : 12; // the hour '0' should be '12'
+            hours = hours ? hours : 12; 
             
             const hoursStr = hours < 10 ? '0' + hours : hours;
             const minutesStr = minutes < 10 ? '0' + minutes : minutes;
@@ -310,22 +395,17 @@
             digitalClock.textContent = `${hoursStr}:${minutesStr}:${secondsStr}`;
             digitalAmPm.textContent = ampm;
         }
-
-        // --- Event Listeners ---
         
-        // Load data when the app window opens
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             setClock();
-            setInterval(setClock, 1000); // Update clock every second
+            setInterval(setClock, 1000); 
         });
-
 
         closeBtn.addEventListener('click', () => window.api.closeApp());
         editConfigBtn.addEventListener('click', () => window.api.openConfig());
         
         window.api.onDataUpdated((data) => {
-
             localStorage.setItem('schoolView-class', data.class);
             localStorage.setItem('schoolView-section', data.section);
             localStorage.setItem('schoolView-strength', data.strength);
@@ -334,10 +414,9 @@
             localStorage.setItem('schoolView-subject', data.subject);
             localStorage.setItem('schoolView-teacher', data.teacher);
             
-
+            loadAndApplyColors(); 
             updateViewFields(data);
         });
-
     </script>
 </body>
 </html>
