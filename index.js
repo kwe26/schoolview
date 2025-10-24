@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, screen } = require('electron');
 const path = require('path');
 
 app.commandLine.appendSwitch('no-sandbox');
+if(process.platform == 'linux') app.commandLine.appendSwitch('enable-transparent-visuals');
+if(process.platform == 'linux') app.commandLine.appendSwitch('disable-gpu');
 
 let mainWindow;
 let configWindow;
@@ -12,7 +14,7 @@ function createMainWindow() {
   const winWidth = 280;
   const winHeight = 350; 
 
-  const xPos = width - winWidth - 20;
+  const xPos = width - winWidth;
   const yPos = 20;
 
   mainWindow = new BrowserWindow({
@@ -25,6 +27,7 @@ function createMainWindow() {
     movable: false, 
     resizable: false,
     minimizable: false,
+    show: false,
     maximizable: false,
     skipTaskbar: true, 
     alwaysOnTop: false,
@@ -32,12 +35,21 @@ function createMainWindow() {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      webSecurity: false
     },
   });
 
   mainWindow.loadFile(path.join('src', 'index.html'));
 
   mainWindow.setIcon(path.join(__dirname, 'icon.png'));
+
+  setTimeout(() => mainWindow.show(), 100)
+
+  setTimeout(() => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.focus();
+    }
+  }, 500);
 
   ipcMain.on('close-app', () => {
     mainWindow.close();

@@ -23,14 +23,6 @@
     "appId": "com.kiwi.schoolview",
     "productName": "SchoolView",
     "copyright": "Copyright © 2024 Kiwi",
-    "files": [
-      "index.js",
-      "preload.js",
-      "index.html",
-      "config.html",
-      "icon.ico",
-      "icon.png"
-    ],
     "win": {
       "icon": "./icon.png",
       "target": [
