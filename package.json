@@ -13,12 +13,15 @@
   "scripts": {
     "start": "electron .",
     "build:win": "electron-builder --win --x64 --ia32",
+    "csscomp": "bunx tailwindcss -i ./src/input.css -o ./src/all.css",
     "build:linux": "electron-builder --linux"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {},
+  "dependencies": {
+    "tailwindcss": "^3.4.17"
+  },
   "build": {
     "appId": "com.kiwi.schoolview",
     "productName": "SchoolView",
